@@ -8,14 +8,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import me.tripsit.tripmobile.fragments.AboutFragment;
 import me.tripsit.tripmobile.fragments.ChatFragment;
 import me.tripsit.tripmobile.fragments.ContactFragment;
+import me.tripsit.tripmobile.fragments.DrugResultFragment;
 import me.tripsit.tripmobile.fragments.InfoFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements InfoFragment.OnDrugSearchListener {
 
     private TextView mTextMessage;
+
+    public void onDrugSearchComplete(JSONObject drug){
+        FragmentManager manager = getSupportFragmentManager();
+        Bundle args = new Bundle();
+        args.putString("data", drug.toString());
+        DrugResultFragment drf = new DrugResultFragment();
+        drf.setArguments(args);
+        manager.beginTransaction().replace(R.id.content, drf).commit();
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
