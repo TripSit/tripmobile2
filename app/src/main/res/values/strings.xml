@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">TripMobile</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="app_name">TripSit</string>
+    <string name="title_chat">Chat</string>
+    <string name="title_info">Drug info</string>
+    <string name="title_about">About</string>
+    <string name="title_contact">Contact</string>
 </resources>
