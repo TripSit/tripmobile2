@@ -42,7 +42,7 @@ public class InfoFragment extends Fragment implements OnClickListener{
             drugCallback = (OnDrugSearchListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnHeadlineSelectedListener");
+                    + " must implement OnDrugSearchListener");
         }
     }
 
