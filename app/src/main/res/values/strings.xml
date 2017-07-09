@@ -4,4 +4,13 @@
     <string name="title_info">Drug info</string>
     <string name="title_about">About</string>
     <string name="title_contact">Contact</string>
+
+    <string name="drug_search_title">Search drug information</string>
+    <string name="drug_search_text_hint">Drug or alias</string>
+    <string name="drug_search_button_text">Search</string>
+
+    <string name="combo_search_title">Search combination information</string>
+    <string name="combo_search_text1_hint">Drug or alias</string>
+    <string name="combo_search_text2_hint">Drug or alias</string>
+    <string name="combo_search_button_text">Search</string>
 </resources>
