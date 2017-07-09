@@ -28,7 +28,7 @@ public class DrugResultFragment extends Fragment {
             String chemName = drug.getJSONArray("data").getJSONObject(0).getString("name");
             resBox.setText(chemName);
         }catch(Exception e){
-            resBox.setText("Error: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);

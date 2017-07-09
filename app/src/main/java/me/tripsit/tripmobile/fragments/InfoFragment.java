@@ -27,22 +27,32 @@ import me.tripsit.tripmobile.R;
 public class InfoFragment extends Fragment implements OnClickListener{
 
     OnDrugSearchListener drugCallback;
+    OnComboSearchListener comboCallback;
 
     public interface OnDrugSearchListener {
         public void onDrugSearchComplete(JSONObject json);
+    }
+
+    public interface OnComboSearchListener {
+        public void onComboSearchComplete(JSONObject json);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
         try {
             drugCallback = (OnDrugSearchListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnDrugSearchListener");
+        }
+
+        try {
+            comboCallback = (OnComboSearchListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnComboSearchListener");
         }
     }
 
@@ -51,27 +61,55 @@ public class InfoFragment extends Fragment implements OnClickListener{
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_info, container, false);
 
-        Button b = (Button) v.findViewById(R.id.drugSearchButton);
-        b.setOnClickListener(this);
+        Button drugSearchButton = (Button) v.findViewById(R.id.drugSearchButton);
+        drugSearchButton.setOnClickListener(this);
+
+        Button comboSearchButton = (Button) v.findViewById(R.id.comboSearchButton);
+        comboSearchButton.setOnClickListener(this);
 
         return v;
     }
 
     @Override
     public void onClick(View v) {
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url;
+        JsonObjectRequest stringRequest;
         switch (v.getId()) {
             case R.id.drugSearchButton:
                 final EditText textBox = (EditText) getView().findViewById(R.id.drugTextBox);
                 // Instantiate the RequestQueue.
-                RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-                String url = "http://tripbot.tripsit.me/api/tripsit/getDrug?name=" + textBox.getText();
+
+                url = "http://tripbot.tripsit.me/api/tripsit/getDrug?name=" + textBox.getText();
 
                 // Request a string response from the provided URL.
-                JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                stringRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 drugCallback.onDrugSearchComplete(response);
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        System.err.println("That didn't work!");
+                    }
+                });
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+                break;
+            case R.id.comboSearchButton:
+                final EditText textBox1 = (EditText) getView().findViewById(R.id.drugComboBox1);
+                final EditText textBox2 = (EditText) getView().findViewById(R.id.drugComboBox2);
+                // Instantiate the RequestQueue.
+                url = "http://tripbot.tripsit.me/api/tripsit/getInteraction?drugA=" + textBox1.getText() + "&drugB=" + textBox2.getText();
+
+                // Request a string response from the provided URL.
+                stringRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                comboCallback.onComboSearchComplete(response);
                             }
                         }, new Response.ErrorListener() {
                     @Override

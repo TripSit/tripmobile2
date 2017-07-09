@@ -12,21 +12,31 @@ import org.json.JSONObject;
 
 import me.tripsit.tripmobile.fragments.AboutFragment;
 import me.tripsit.tripmobile.fragments.ChatFragment;
+import me.tripsit.tripmobile.fragments.ComboResultFragment;
 import me.tripsit.tripmobile.fragments.ContactFragment;
 import me.tripsit.tripmobile.fragments.DrugResultFragment;
 import me.tripsit.tripmobile.fragments.InfoFragment;
 
-public class MainActivity extends AppCompatActivity implements InfoFragment.OnDrugSearchListener {
+public class MainActivity extends AppCompatActivity implements InfoFragment.OnDrugSearchListener, InfoFragment.OnComboSearchListener{
 
     private TextView mTextMessage;
 
-    public void onDrugSearchComplete(JSONObject drug){
+    public void onDrugSearchComplete(JSONObject drug){ //TODO: combine these
         FragmentManager manager = getSupportFragmentManager();
         Bundle args = new Bundle();
         args.putString("data", drug.toString());
         DrugResultFragment drf = new DrugResultFragment();
         drf.setArguments(args);
         manager.beginTransaction().replace(R.id.content, drf).commit();
+    }
+
+    public void onComboSearchComplete(JSONObject combo){
+        FragmentManager manager = getSupportFragmentManager();
+        Bundle args = new Bundle();
+        args.putString("data", combo.toString());
+        ComboResultFragment crf = new ComboResultFragment();
+        crf.setArguments(args);
+        manager.beginTransaction().replace(R.id.content, crf).commit();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
