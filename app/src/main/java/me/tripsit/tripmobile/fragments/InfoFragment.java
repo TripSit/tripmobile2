@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -72,11 +73,14 @@ public class InfoFragment extends Fragment implements OnClickListener{
 
     @Override
     public void onClick(View v) {
+        final ProgressBar progressBar = (ProgressBar) getView().findViewById(R.id.searchProgress);
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url;
         JsonObjectRequest stringRequest;
         switch (v.getId()) {
             case R.id.drugSearchButton:
+                progressBar.setVisibility(View.VISIBLE);
+
                 final EditText textBox = (EditText) getView().findViewById(R.id.drugTextBox);
                 // Instantiate the RequestQueue.
 
@@ -87,11 +91,13 @@ public class InfoFragment extends Fragment implements OnClickListener{
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
+                                progressBar.setVisibility(View.INVISIBLE);
                                 drugCallback.onDrugSearchComplete(response);
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressBar.setVisibility(View.INVISIBLE);
                         System.err.println("That didn't work!");
                     }
                 });
@@ -99,6 +105,8 @@ public class InfoFragment extends Fragment implements OnClickListener{
                 queue.add(stringRequest);
                 break;
             case R.id.comboSearchButton:
+                progressBar.setVisibility(View.VISIBLE);
+
                 final EditText textBox1 = (EditText) getView().findViewById(R.id.drugComboBox1);
                 final EditText textBox2 = (EditText) getView().findViewById(R.id.drugComboBox2);
                 // Instantiate the RequestQueue.
@@ -109,11 +117,13 @@ public class InfoFragment extends Fragment implements OnClickListener{
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
+                                progressBar.setVisibility(View.INVISIBLE);
                                 comboCallback.onComboSearchComplete(response);
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressBar.setVisibility(View.INVISIBLE);
                         System.err.println("That didn't work!");
                     }
                 });
