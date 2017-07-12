@@ -1,11 +1,20 @@
 package me.tripsit.tripmobile;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -16,10 +25,30 @@ import me.tripsit.tripmobile.fragments.ComboResultFragment;
 import me.tripsit.tripmobile.fragments.ContactFragment;
 import me.tripsit.tripmobile.fragments.DrugResultFragment;
 import me.tripsit.tripmobile.fragments.InfoFragment;
+import me.tripsit.tripmobile.services.IRCChatService;
 
 public class MainActivity extends AppCompatActivity implements InfoFragment.OnDrugSearchListener, InfoFragment.OnComboSearchListener{
 
     private TextView mTextMessage;
+
+    public Messenger mService = null;
+    public boolean mBound;
+
+    public ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            mBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+            mBound = false;
+        }
+    };
+
+    public void testMethod(){
+
+    }
 
     public void onDrugSearchComplete(JSONObject drug){ //TODO: combine these
         FragmentManager manager = getSupportFragmentManager();
@@ -63,6 +92,21 @@ public class MainActivity extends AppCompatActivity implements InfoFragment.OnDr
         }
 
     };
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        bindService(new Intent(this, IRCChatService.class), mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
