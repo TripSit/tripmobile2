@@ -31,25 +31,6 @@ public class MainActivity extends AppCompatActivity implements InfoFragment.OnDr
 
     private TextView mTextMessage;
 
-    public Messenger mService = null;
-    public boolean mBound;
-
-    public ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mService = new Messenger(service);
-            mBound = true;
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            mService = null;
-            mBound = false;
-        }
-    };
-
-    public void testMethod(){
-
-    }
-
     public void onDrugSearchComplete(JSONObject drug){ //TODO: combine these
         FragmentManager manager = getSupportFragmentManager();
         Bundle args = new Bundle();
@@ -96,16 +77,7 @@ public class MainActivity extends AppCompatActivity implements InfoFragment.OnDr
     @Override
     protected void onStart(){
         super.onStart();
-        bindService(new Intent(this, IRCChatService.class), mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
+        startService(new Intent(this, IRCChatService.class));
     }
 
     @Override

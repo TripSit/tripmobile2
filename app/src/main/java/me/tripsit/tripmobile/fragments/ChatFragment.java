@@ -14,29 +14,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import me.tripsit.tripmobile.MainActivity;
+import org.greenrobot.eventbus.EventBus;
+
 import me.tripsit.tripmobile.R;
-import me.tripsit.tripmobile.services.IRCChatService;
+import me.tripsit.tripmobile.events.MessageEvent;
 
 public class ChatFragment extends Fragment {
-    public void sayHello() {
-        MainActivity activity = (MainActivity)getActivity();
-        if (!activity.mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain();
-        msg.what = IRCChatService.MSG_SAY_HELLO;
-        msg.obj = "test";
-        try {
-            activity.mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+    /*
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
     }
 
     @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+*/
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        sayHello();
+        EventBus.getDefault().postSticky(new MessageEvent("Hello everyone!"));
         return inflater.inflate(R.layout.fragment_chat, container, false);
     }
 }
