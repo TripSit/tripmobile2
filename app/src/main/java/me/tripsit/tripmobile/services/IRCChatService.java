@@ -15,7 +15,7 @@ public class IRCChatService extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_SAY_HELLO:
-                    Toast.makeText(getApplicationContext(), "hello!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "hello " + (String)msg.obj, Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     super.handleMessage(msg);

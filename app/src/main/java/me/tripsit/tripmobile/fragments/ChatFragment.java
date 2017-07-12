@@ -23,7 +23,9 @@ public class ChatFragment extends Fragment {
         MainActivity activity = (MainActivity)getActivity();
         if (!activity.mBound) return;
         // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, IRCChatService.MSG_SAY_HELLO, 0, 0);
+        Message msg = Message.obtain();
+        msg.what = IRCChatService.MSG_SAY_HELLO;
+        msg.obj = "test";
         try {
             activity.mService.send(msg);
         } catch (RemoteException e) {
