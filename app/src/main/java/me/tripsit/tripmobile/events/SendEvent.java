@@ -1,10 +1,10 @@
 package me.tripsit.tripmobile.events;
 
-public class MessageEvent {
+public class SendEvent {
 
     public final String message;
 
-    public MessageEvent(String message) {
+    public SendEvent(String message) {
         this.message = message;
     }
 }
