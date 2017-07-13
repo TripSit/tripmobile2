@@ -114,6 +114,13 @@ public class IRCChatService extends Service {
                 PrintWriter out = new PrintWriter( new BufferedWriter( new OutputStreamWriter(sslsocket.getOutputStream())),true);
                 String line = "";
                 while (!cancelled) {
+                    if(queue.toArray().length > 0){
+                        String command = queue.remove(0) + "\r\n";
+                        System.out.print("--------------------------------- " + command);
+                        out.print(command);
+                        out.flush();
+                    }
+
                     line = dIn.readLine();
 
                     if (line != null) {
@@ -126,13 +133,6 @@ public class IRCChatService extends Service {
                                 break;
                         }
                         EventBus.getDefault().postSticky(new RecieveEvent(line));
-                    }
-
-                    if(queue.toArray().length > 0){
-                        String command = queue.remove(0) + "\r\n";
-                        System.out.print("--------------------------------- " + command);
-                        out.print(command);
-                        out.flush();
                     }
                 }
 

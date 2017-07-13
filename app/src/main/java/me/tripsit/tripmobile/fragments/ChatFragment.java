@@ -35,6 +35,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
         Button submit = (Button) v.findViewById(R.id.button);
         submit.setOnClickListener(this);
+
+        Button nick = (Button) v.findViewById(R.id.nick);
+        nick.setOnClickListener(this);
+
+        Button user = (Button) v.findViewById(R.id.user);
+        user.setOnClickListener(this);
+
+        Button join = (Button) v.findViewById(R.id.join);
+        join.setOnClickListener(this);
         return v;
     }
 
@@ -45,6 +54,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()) {
             case R.id.button:
                 EventBus.getDefault().postSticky(new SendEvent(command.getText() + ""));
+                break;
+            case R.id.nick:
+                EventBus.getDefault().postSticky(new SendEvent("NICK TripAppTest"));
+                break;
+            case R.id.user:
+                EventBus.getDefault().postSticky(new SendEvent("USER TripAppTest TripAppTest TripAppTest :Test app"));
+                break;
+            case R.id.join:
+                EventBus.getDefault().postSticky(new SendEvent("JOIN #luciditystill"));
                 break;
         }
     }
