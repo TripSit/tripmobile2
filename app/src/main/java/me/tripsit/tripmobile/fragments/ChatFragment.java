@@ -33,37 +33,20 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_chat, container, false);
 
-        Button submit = (Button) v.findViewById(R.id.button);
-        submit.setOnClickListener(this);
-
-        Button nick = (Button) v.findViewById(R.id.nick);
-        nick.setOnClickListener(this);
-
-        Button user = (Button) v.findViewById(R.id.user);
-        user.setOnClickListener(this);
-
-        Button join = (Button) v.findViewById(R.id.join);
-        join.setOnClickListener(this);
+        Button send = (Button) v.findViewById(R.id.sendButton);
+        send.setOnClickListener(this);
         return v;
     }
 
     @Override
     public void onClick(View v) {
-        final TextView command = (TextView) getView().findViewById(R.id.editText);
-        final Button submit = (Button) getView().findViewById(R.id.button);
+        final TextView message = (TextView) getView().findViewById(R.id.message);
         switch (v.getId()) {
-            case R.id.button:
-                EventBus.getDefault().postSticky(new SendEvent(command.getText() + ""));
-                break;
-            case R.id.nick:
-                EventBus.getDefault().postSticky(new SendEvent("NICK TripAppTest"));
-                break;
-            case R.id.user:
-                EventBus.getDefault().postSticky(new SendEvent("USER TripAppTest TripAppTest TripAppTest :Test app"));
-                break;
-            case R.id.join:
-                EventBus.getDefault().postSticky(new SendEvent("JOIN ##luciditystill"));
+            case R.id.sendButton:
+                EventBus.getDefault().postSticky(new SendEvent(message.getText() + ""));
+                message.setText("");
                 break;
         }
+
     }
 }

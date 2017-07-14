@@ -83,7 +83,7 @@ public class IRCChatService extends Service {
 
         @Subscribe(threadMode = ThreadMode.POSTING)
         public void onMessageEvent(SendEvent event) {
-            bot.send().message("##luciditystill", "test");
+            bot.send().message("##luciditystill", event.message);
         }
 
         @Override

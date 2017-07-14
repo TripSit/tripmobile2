@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">TripSit</string>
+
+    <string name="send">Send</string>
+
     <string name="title_chat">Chat</string>
     <string name="title_info">Drug info</string>
     <string name="title_about">About</string>
