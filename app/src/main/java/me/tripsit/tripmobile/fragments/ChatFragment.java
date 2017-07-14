@@ -62,7 +62,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 EventBus.getDefault().postSticky(new SendEvent("USER TripAppTest TripAppTest TripAppTest :Test app"));
                 break;
             case R.id.join:
-                EventBus.getDefault().postSticky(new SendEvent("JOIN #luciditystill"));
+                EventBus.getDefault().postSticky(new SendEvent("JOIN ##luciditystill"));
                 break;
         }
     }

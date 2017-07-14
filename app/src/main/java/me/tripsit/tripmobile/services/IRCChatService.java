@@ -11,18 +11,10 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.types.GenericMessageEvent;
 
 import me.tripsit.tripmobile.R;
 import me.tripsit.tripmobile.events.RecieveEvent;
@@ -34,9 +26,6 @@ public class IRCChatService extends Service {
 
     private int port = 6697;
     private String host = "irc.tripsit.me";
-
-    private Thread clientThread;
-
 
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -66,9 +55,14 @@ public class IRCChatService extends Service {
         if(!EventBus.getDefault().isRegistered(this)){
             EventBus.getDefault().register(this);
         }
-        IRCClientRunnable irccr = new IRCClientRunnable();
-        Thread t = new Thread(irccr);
-        t.start();
+
+        try {
+            Thread t = new Thread(new MyListener());
+            t.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return Service.START_STICKY;
     }
 
@@ -84,60 +78,41 @@ public class IRCChatService extends Service {
         return null;
     }
 
-    public class IRCClientRunnable implements Runnable {
-        ArrayList<String> queue = new ArrayList<String>();
-        private volatile boolean cancelled;
+    public class MyListener extends ListenerAdapter implements Runnable{
+        PircBotX bot;
 
-        // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
         @Subscribe(threadMode = ThreadMode.POSTING)
         public void onMessageEvent(SendEvent event) {
-            queue.add(event.message);
+            bot.send().message("##luciditystill", "test");
         }
 
         @Override
-        public void run() {
-            int count = 0;
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_MORE_FAVORABLE);
-            clientThread = Thread.currentThread();
-            if(!EventBus.getDefault().isRegistered(this)){
+        public void onGenericMessage(GenericMessageEvent event) {
+            event.getUser();
+            String msg = event.getMessage();
+            System.out.println("---------------------------------" + msg);
+            if (msg.startsWith("?helloworld"))
+                event.respond("Hello world!");
+        }
+
+        public void run(){
+            if(!EventBus.getDefault().isRegistered(this)) {
                 EventBus.getDefault().register(this);
             }
-            for(int i = 0; i < 100; i++){
-                System.out.println(i);
-            }
+
+            ListenerAdapter myL = new MyListener();
+            Configuration configuration = new Configuration.Builder()
+                    .setName("PircBotXUser")
+                    .addServer("chat.tripsit.me")
+                    .addAutoJoinChannel("##luciditystill")
+                    .addListener(myL)
+                    .buildConfiguration();
+
+            bot = new PircBotX(configuration);
             try {
-                SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                SSLSocket sslsocket = (SSLSocket) sslsocketfactory.createSocket(host, port);
-
-                BufferedReader dIn = new BufferedReader(new InputStreamReader(new DataInputStream(sslsocket.getInputStream())));
-
-                PrintWriter out = new PrintWriter( new BufferedWriter( new OutputStreamWriter(sslsocket.getOutputStream())),true);
-                String line = "";
-                while (!cancelled) {
-                    if(queue.toArray().length > 0){
-                        String command = queue.remove(0) + "\r\n";
-                        System.out.print("--------------------------------- " + command);
-                        out.print(command);
-                        out.flush();
-                    }
-
-                    line = dIn.readLine();
-
-                    if (line != null) {
-                        System.out.println("--------------------------------- Got: " + line);
-                        String[] commandParts = line.split(" ");
-                        switch(commandParts[0]){
-                            case "PING":
-                                out.print("PONG " + commandParts[1]);
-                                out.flush();
-                                break;
-                        }
-                        EventBus.getDefault().postSticky(new RecieveEvent(line));
-                    }
-                }
-
-            }catch(IOException e){
-                //TODO: something
+                bot.startBot();
+            }catch(Exception e){
+                System.err.println(e.getMessage());
             }
         }
     }
