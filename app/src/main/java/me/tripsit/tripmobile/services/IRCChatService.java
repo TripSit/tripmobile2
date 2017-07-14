@@ -91,6 +91,7 @@ public class IRCChatService extends Service {
             event.getUser();
             String msg = event.getMessage();
             System.out.println("---------------------------------" + msg);
+            EventBus.getDefault().postSticky(new RecieveEvent(msg));
             if (msg.startsWith("?helloworld"))
                 event.respond("Hello world!");
         }
@@ -101,8 +102,11 @@ public class IRCChatService extends Service {
             }
 
             ListenerAdapter myL = new MyListener();
+            String randomID = java.util.UUID.randomUUID().toString().substring(0,6);
             Configuration configuration = new Configuration.Builder()
-                    .setName("PircBotXUser")
+                    .setName("AppUser" + randomID)
+                    .setRealName(randomID)
+                    .setLogin(randomID)
                     .addServer("chat.tripsit.me")
                     .addAutoJoinChannel("##luciditystill")
                     .addListener(myL)
