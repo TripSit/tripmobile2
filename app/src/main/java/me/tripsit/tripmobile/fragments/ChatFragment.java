@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -15,10 +14,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import me.tripsit.tripmobile.R;
-import me.tripsit.tripmobile.events.RecieveEvent;
+import me.tripsit.tripmobile.events.GenericEvent;
+import me.tripsit.tripmobile.events.MessageArrayEvent;
+import me.tripsit.tripmobile.events.MessageEvent;
+import me.tripsit.tripmobile.events.ReceiveEvent;
 import me.tripsit.tripmobile.events.SendEvent;
 
 public class ChatFragment extends ListFragment implements View.OnClickListener{
@@ -39,9 +40,25 @@ public class ChatFragment extends ListFragment implements View.OnClickListener{
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(RecieveEvent event) {
-        listItems.add(event.message);
+    public void onMessageEvent(MessageEvent event) {
+        listItems.add("<" + event.user.getNick() + "> " + event.message);
         aa.notifyDataSetChanged();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageArrayEvent event) {
+        for(MessageEvent me : event.array) {
+            if(me.user != null) {
+                listItems.add("<" + me.user.getNick() + "> " + me.message);
+            }
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        listItems.clear();
+        EventBus.getDefault().postSticky(new GenericEvent(GenericEvent.GET_FULL_CHAT));
     }
 
     @Override

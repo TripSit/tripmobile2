@@ -4,55 +4,65 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Process;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 
+import java.util.ArrayList;
+
 import me.tripsit.tripmobile.R;
-import me.tripsit.tripmobile.events.RecieveEvent;
+import me.tripsit.tripmobile.events.GenericEvent;
+import me.tripsit.tripmobile.events.MessageArrayEvent;
+import me.tripsit.tripmobile.events.MessageEvent;
+import me.tripsit.tripmobile.events.ReceiveEvent;
 import me.tripsit.tripmobile.events.SendEvent;
 
 public class IRCChatService extends Service {
+    public boolean started = false;
     public static final int MSG_SAY_HELLO = 1;
-    public int count = 0;
 
     private int port = 6697;
     private String host = "irc.tripsit.me";
 
+    ArrayList<MessageEvent> msgList = new ArrayList<MessageEvent>();
+    int maxMsg = 300; //TODO: make adjustable
+
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(RecieveEvent event) {
-        //Toast.makeText(getApplicationContext(), event.message + " " + count, Toast.LENGTH_SHORT).show();
-        count++;
+    public void onMessageEvent(ReceiveEvent event) {
+        if(msgList.size() >= maxMsg){
+            msgList.remove(0);
+        }
+        MessageEvent me = new MessageEvent(event.user, event.message);
+        msgList.add(me);
+
+        System.out.println("-----------------" + event.message);
+        EventBus.getDefault().postSticky(me);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(GenericEvent event) {
+        switch(event.command){
+            case GenericEvent.GET_FULL_CHAT:
+                MessageEvent[] sentArray = new MessageEvent[msgList.size()];
+                sentArray = msgList.toArray(sentArray);
+                EventBus.getDefault().postSticky(new MessageArrayEvent(sentArray));
+                break;
+        }
     }
 
     @Override
     public void onCreate(){
         super.onCreate();
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_icon)
-                        .setContentTitle("Connected to TripSit")
-                        .setContentText("Have a great time!");
-
-        Notification notification = mBuilder.build();
-
-        startForeground(5, notification);
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if(!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
 
@@ -63,6 +73,19 @@ public class IRCChatService extends Service {
             e.printStackTrace();
         }
 
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_icon)
+                        .setContentTitle("Connected to TripSit")
+                        .setContentText("Have a great time!");
+
+        Notification notification = mBuilder.build();
+
+        startForeground(5, notification);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return Service.START_STICKY;
     }
 
@@ -88,12 +111,12 @@ public class IRCChatService extends Service {
 
         @Override
         public void onGenericMessage(GenericMessageEvent event) {
-            event.getUser();
+            User user = event.getUser();
             String msg = event.getMessage();
-            System.out.println("---------------------------------" + msg);
-            EventBus.getDefault().postSticky(new RecieveEvent(msg));
-            if (msg.startsWith("?helloworld"))
+            if (msg.startsWith("?helloworld")) {
                 event.respond("Hello world!");
+            }
+            EventBus.getDefault().postSticky(new ReceiveEvent(user, msg));
         }
 
         public void run(){
