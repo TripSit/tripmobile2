@@ -9,10 +9,12 @@ import android.support.v4.app.NotificationCompat;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.types.GenericChannelEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 
 import java.util.ArrayList;
@@ -117,6 +119,14 @@ public class IRCChatService extends Service {
                 event.respond("Hello world!");
             }
             EventBus.getDefault().postSticky(new ReceiveEvent(user, msg));
+        }
+
+        @Override
+        public void onGenericChannel(GenericChannelEvent event){
+            Channel channel = event.getChannel();
+            if(channel != null){
+                EventBus.getDefault().postSticky(new GenericEvent(GenericEvent.CHAT_READY));
+            }
         }
 
         public void run(){

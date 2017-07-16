@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -40,6 +41,16 @@ public class ChatFragment extends ListFragment implements View.OnClickListener{
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(GenericEvent event) {
+        switch(event.command){
+            case GenericEvent.CHAT_READY:
+                LinearLayout progressBar = (LinearLayout) getView().findViewById(R.id.sendLayout);
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         listItems.add("<" + event.user.getNick() + "> " + event.message);
         aa.notifyDataSetChanged();
@@ -52,6 +63,8 @@ public class ChatFragment extends ListFragment implements View.OnClickListener{
                 listItems.add("<" + me.user.getNick() + "> " + me.message);
             }
         }
+        LinearLayout progressBar = (LinearLayout) getView().findViewById(R.id.sendLayout);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override

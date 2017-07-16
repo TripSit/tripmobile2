@@ -11,7 +11,8 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:paddingBottom="10dp"
-        android:transcriptMode="alwaysScroll"/>
+        android:transcriptMode="alwaysScroll"
+        android:text="Test" />
 
     <LinearLayout
         android:id="@+id/sendLayout"
@@ -19,7 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <EditText
             android:id="@+id/message"
